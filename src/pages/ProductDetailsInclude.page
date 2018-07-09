@@ -1,0 +1,156 @@
+<apex:page docType="html-5.0" sidebar="false" showHeader="false" standardStylesheets="false" cache="false" applyHtmlTag="false" controller="cc_demo_PDPCtrl">
+ <script id="Ext-ProductDetail-Desktop" type="text/template">
+ {{extendedData this}}
+ 
+    <div class="product_detail_container product_type_standard">
+        <h2 class="title">{{this.product.prodBean.name}}</h2>
+        <div class="product_detail" >
+            <div class="alert alert-error messagingSection-Error" style="display: none"></div>
+            <div class="alert alert-info messagingAction-Info" style="display: none">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            </div>
+            <div class="prod_media">
+                {{#if this.mediaWrappers.[SVG Interactive Diagram]}}
+                    {{#each this.mediaWrappers.[SVG Interactive Diagram]}}
+                        <div class="interactive">{{displaySVG this 'mainProdImage prodDetail'}}</div>
+                    {{/each}}
+                {{/if}}
+                <div id="altImageModal" class="modal hide fade in" tabindex="-1" role="dialog">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="myModalLabel"></h4>
+                    </div>
+                    <div class="modal-body">
+                        <img class="modalImg" src=""/>
+                        <p class="modalText"></p>
+                    </div>
+                </div>
+                {{#if this.product.mediaWrapper }}
+                    <div class="product_detail_viewport" id="photoContainer">
+                        <div>{{displayImage this.product.mediaWrapper 'mainProdImage prodDetail'}}</div>
+                        {{#if this.mediaWrappers.[Alternate Images]}}
+                            <div class="altImages">
+                                <img class="alternate" src="{{productImage ../product.mediaWrapper}}" data-id="{{../product.mediaWrapper.altMessage}}"/>
+                                {{#each this.mediaWrappers.[Alternate Images]}}
+                                    <img class="alternate" src="{{productImage this}}" data-id="{{this.altMessage}}"/>
+                                {{/each}}
+                            </div>
+                        {{/if}}
+                    </div>
+                {{else}}
+                    {{#if this.mediaWrappers.[SVG Interactive Diagram]}}
+                    {{else}}
+                        <div class="product_detail_viewport" id="photoContainer">
+                            <div>{{displayImage this.product.mediaWrapper 'mainProdImage prodDetail'}}</div>
+                        </div>
+                    {{/if}}
+                {{/if}}
+            </div>
+            <div class="product_detail_item phoneProductItem wishFinder" data-sku="{{this.product.prodBean.sku}}">
+                <div class="product_title">{{this.product.prodBean.name}}</div>
+                {{#ifDisplay 'PD.DsplSku'}}
+                    <div class="sku"><div class="label">{{pageLabelMap 'ProductDetailsInc_SKU'}}</div><div class="value">{{this.product.prodBean.sku}}</div></div>
+                {{/ifDisplay}}
+                {{#if this.customField1}}
+    <div class="prodDesc"><div class="pblock">{{unescape this.customField1}}</div></div>
+{{/if}}
+                {{#ifDisplay 'PD.DsplUOM'}}
+                    <div class="uom"><div class="label">{{pageLabelMap 'ProductDetails_UnitOfMeasure'}}</div><div class="value">{{this.product.prodBean.UnitOfMeasure}}</div></div>
+                {{/ifDisplay}}
+                {{#ifDisplay 'PD.DsplAvlb'}}
+                    <div class="inventory">
+                        <div class="label">{{pageLabelMap 'ProductDetails_Availability'}}</div>
+                        {{#ifStoreSetting 'InventoryCheckFlag__c'}}
+                            <div class="value">{{this.product.inventory}}</div>
+                        {{else}}
+                            <div class="value">{{this.product.availMsg}}</div>
+                        {{/ifStoreSetting}}
+                    </div>
+                {{/ifDisplay}}
+                {{#ifDisplay 'PR.Enabled'}}
+                    <div id="avgRating" class="rateit" data-rateit-value="{{this.product.avgRating}}" data-rateit-ispreset="true" data-rateit-readonly="true">
+                        <div class="label">{{pageLabelMap 'NumberofReviews' this.numberOfReviews }}</div>
+                    </div>
+                {{/ifDisplay}}
+                {{#ifDisplay 'PD.DsplSDesc'}}
+                    <div class="shortDesc"><div class="pblock">{{{this.product.prodBean.shortDesc}}}</div></div>
+                {{/ifDisplay}}
+                {{#if this.product.showPricing}}
+                    {{#ifDisplay 'PD.DsplPrc'}}
+                        {{#if this.product.price}}
+                            <div class="price_block">
+                                {{#ifDisplay 'PD.DsplListPrc'}}
+                                    {{#if this.product.basePrice}}
+                                        <div class="baseprice">
+                                            <div class="label">{{pageLabelMap 'ProductDetails_ListPrice'}}</div>
+                                            <div class="value">{{price this.product.basePrice}}</div>
+                                        </div>
+                                    {{/if}}
+                                {{/ifDisplay}}
+                                <div class="price">
+                                    <div class="label">{{pageLabelMap 'Price'}}</div>
+                                    <div class="value">{{price this.product.price}}</div>
+                                </div>
+                                {{#ifDisplay 'PD.DsplSvPrc'}}
+                                    {{#if this.product.savings}}
+                                        <div class="savings">
+                                            <div class="label">{{pageLabelMap 'YouSave'}}</div>
+                                            <div class="value">{{price this.product.savings}}</div>
+                                        </div>
+                                    {{/if}}
+                                {{/ifDisplay}}
+                            </div>
+                        {{/if}}
+                    {{/ifDisplay}}
+                {{/if}}
+                {{#if this.product.canAddtoCart}}
+                    <div class="quantity_block">
+                        {{#if this.product.qtySkipIncrement}}
+                            <input type="button" value="{{pageLabelMap 'Prod_QtyDecrFF'}}" class="plus_minus minusFF">
+                        {{/if}}
+                        {{#ifNotEquals this.product.qtySingleIncrement 1}}
+                            <input type="button" value="{{pageLabelMap 'Prod_QtyDecrSingle'}}" class="plus_minus minus">
+                            <input type="text" readonly="true" name="qty" value="0" class="entry plus_minus" />
+                            <input type="button" value="{{pageLabelMap 'Prod_QtyIncrSingle'}}" class="plus_minus plus">
+                        {{else}}
+                            <div class="label">{{pageLabelMap 'Qty'}}</div><input type="text" id="qty" name="qty" value="1" class="input-text entry plus_minus" maxlength="7" />
+                        {{/ifNotEquals}}
+                        {{#if this.product.qtySkipIncrement}}
+                            <input type="button" value="{{pageLabelMap 'Prod_QtyIncrFF'}}" class="plus_minus plusFF">
+                        {{/if}}
+                        <input type="hidden" name="qtyIncrement" value="{{this.product.qtySingleIncrement}}" class="item_qtyIncrement" />
+                        <input type="hidden" name="qtySkipIncrement" value="{{this.product.qtySkipIncrement}}" class="item_qtySkipIncrement" />
+                    </div>
+                    {{#if this.product.prodBean.showSubscriptionSelection}}
+                        <div class="subscriptionSelectionDiv">
+                            <p class="subscription_selection"><span class="subscriptionLabel">{{pageLabelMap 'Subscribe_And_Save_Label'}}</span>
+                                <select class="subscriptionFrequencySelection" data-subscription="{{this.product.prodBean.sku}}">
+                                    {{#each this.product.prodBean.subscriptionFrequencies}}
+                                    <option value="{{safeQuote this}}">{{pageLabelMapMultiString 'Subscribe_And_Save_' this}}</option>
+                                    {{/each}}
+                                </select>
+                            </p>
+                        </div>
+                    {{/if}}
+                    <div class="action" >
+                        <button type="button" class="btn btn-primary addItem" data-sku="{{this.product.prodBean.sku}}">{{pageLabelMap 'Component_MiniwishList_AddToCart'}}</button>
+                    </div>
+                    <div class="wishButtons plus_minus"></div>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+    <div class="tabSection"></div>
+    <div class="widgetSection"></div>
+</script>
+
+<script>
+    jQuery(function($){
+        CCRZ.uiProperties.productDetailView.desktop.tmpl = 'Ext-ProductDetail-Desktop';
+        var extendedModel = {!extendedProdJSON};
+        Handlebars.registerHelper("extendedData", function(currModel) {
+            _.extend(currModel, extendedModel.extProdData);
+        });
+    });
+</script>
+</apex:page>
